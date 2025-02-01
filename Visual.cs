@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Spectre.Console;
 namespace MazeRunner{
   public class Show{
     public static void Maze(int p1X, int p1Y, int p2X, int p2Y, int[,] maze, int height, int width, string icon1, string icon2){
