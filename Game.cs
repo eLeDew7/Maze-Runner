@@ -8,11 +8,6 @@ namespace MazeRunner{
             int p1X = 1, p1Y = 0;
             int p2X = height - 2, p2Y = width - 1;
             int tPoints = 35;
-
-            int p1Score = 0;
-            int p2Score = 0;
-            int maxg1 = p1.goal;
-            int maxg2 = p2.goal;
             int cd1 = p1.cooldown;
             int cd2 = p2.cooldown;
             int pcount1 = 0;
@@ -23,21 +18,18 @@ namespace MazeRunner{
             int pp2Y = 0;
             string icon1 = p1.icon;
             string icon2 = p2.icon;
-            //int g1 = 0;
-            //int g2 = 0;
 
 
             Player cPlayer = p1;
             int movesLeft = cPlayer.moves;
             
-
+            Console.Clear();
 
             while(true){
               
 
-              Console.Clear();
+              Console.SetCursorPosition(0 , 0);
               Show.Maze(p1X, p1Y, p2X, p2Y, maze, height, width, icon1, icon2);
-
               Console.WriteLine($"Es el turno del {(cPlayer == p1 ? "Jugador 1" : "Jugador 2")}");
               Console.WriteLine($"Puntos recolectados: {cPlayer.points}, quedan {TruepointC(cPlayer.goal , cPlayer.points)}");
               Console.WriteLine($"Movimientos restantes: {movesLeft}");
