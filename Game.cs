@@ -22,14 +22,16 @@ namespace MazeRunner{
 
             Player cPlayer = p1;
             int movesLeft = cPlayer.moves;
-            
             Console.Clear();
+            
+
 
             while(true){
               
 
               Console.SetCursorPosition(0 , 0);
               Show.Maze(p1X, p1Y, p2X, p2Y, maze, height, width, icon1, icon2);
+
               Console.WriteLine($"Es el turno del {(cPlayer == p1 ? "Jugador 1" : "Jugador 2")}");
               Console.WriteLine($"Puntos recolectados: {cPlayer.points}, quedan {TruepointC(cPlayer.goal , cPlayer.points)}");
               Console.WriteLine($"Movimientos restantes: {movesLeft}");
@@ -39,42 +41,23 @@ namespace MazeRunner{
               ConsoleKey key = Console.ReadKey(true).Key;
               
 
-              int newX = (cPlayer == p1 ? p1X : p2X);
-              int newY = (cPlayer == p1 ? p1Y : p2Y);
+              int newX = cPlayer == p1 ? p1X : p2X;
+              int newY = cPlayer == p1 ? p1Y : p2Y;
 
               if(key == ConsoleKey.H && cPlayer.cooldown == 0){
-                  if(cPlayer.iden == 0){
-                    cPlayer.ghost = cPlayer.Skill(0);
+                if(cPlayer == p1){
+                cPlayer.cooldown = cd1;
+                }
+                else{
+                   cPlayer.cooldown = cd2;
+                     }
+                if(cPlayer.iden == 0 || cPlayer.iden == 1 || cPlayer.iden == 2){
+                  SkillActivate(cPlayer.iden, cPlayer);
+                }
+                else if(cPlayer.iden == 3){
                     if(cPlayer == p1){
-                      cPlayer.cooldown = cd1;
-                    }
-                    else{
-                    cPlayer.cooldown = cd2;
-                    } 
-                  }
-                  else if(cPlayer.iden == 1){
-                    cPlayer.shark = cPlayer.Skill(1);
-                    if(cPlayer == p1){
-                      cPlayer.cooldown = cd1;
-                    }
-                    else{
-                      cPlayer.cooldown = cd2;
-                    }
-                  }
-                  else if(cPlayer.iden == 2){
-                    cPlayer.hunger = cPlayer.Skill(2);
-                    if(cPlayer == p1){
-                      cPlayer.cooldown = cd1;
-                    }
-                    else{
-                      cPlayer.cooldown = cd2;
-                    }
-                  }
-                  else if(cPlayer.iden == 3){
-                    if(cPlayer == p1){
-                      cPlayer.cooldown = cd1;
                       if(pcount1 == 0){
-                        maze[p1X, p1Y] = 6;
+                      maze[p1X, p1Y] = 6;
                       pcount1 = 1;
                       pp1X = p1X;
                       pp1Y = p1Y;
@@ -88,7 +71,6 @@ namespace MazeRunner{
                       
                     }
                     else if(cPlayer == p2){
-                      cPlayer.cooldown = cd2;
                       if(pcount2 == 0){
                       maze[p2X, p2Y] = 6;
                       pcount2 = 1;
@@ -112,8 +94,6 @@ namespace MazeRunner{
                       p2Y = newY;
                       newX = x;
                       newY = y;
-
-                      cPlayer.cooldown = cd1;
                     }
                     else{
                       int x = p1X;
@@ -122,106 +102,52 @@ namespace MazeRunner{
                       p1Y = newY;
                       newX = x;
                       newY = y;
-                      cPlayer.cooldown = cd2;
                     }
                   }
                   else if(cPlayer.iden == 5){
                     if(cPlayer == p1){
-                      cPlayer.cooldown = cd1;
                         maze[p1X, p1Y] = 7;
                       }
                       else{
-                        cPlayer.cooldown = cd2;
                         maze[p2X, p2Y] = 8;
                       }
                       
                     }
                   }
+                  else if(cPlayer.shark > 0){
+                    while(Maze.Bounds(newX, newY, width, height) && maze[newX, newY] != 1 && maze[newX, newY] != 3 && maze[newX, newY] != 4 && maze[newX, newY] != 5){
+                      if(maze[newX, newY] == 2)
+                      {
+                        maze[newX, newY] = 0;
+                        cPlayer.points++;
+                        tPoints--;
+                      }
+                      if(cPlayer == p1){
+                        p1X = newX;
+                        p1Y = newY;
+                      }
+                      else{
+                        p2X = newX;
+                        p2Y = newY;
+                      }
+                      newX += (key == ConsoleKey.W) ? -1 : (key == ConsoleKey.S) ? 1 : 0;
+                      newY += (key == ConsoleKey.A) ? -1 : (key == ConsoleKey.D) ? 1 : 0;
+                    }
+                    cPlayer.shark = 0;
+                  }
               
-              else if (key == ConsoleKey.W && cPlayer.shark == 0) newX--;
+              else if (key == ConsoleKey.W) newX--;
+              else if (key == ConsoleKey.S) newX++;
+              else if (key == ConsoleKey.A) newY--;
+              else if (key == ConsoleKey.D) newY++;
 
-              else if (key == ConsoleKey.W && cPlayer.shark == 1){
-                while(Maze.Bounds(newX, newY, width, height) && maze[newX, newY] != 1 && maze[newX, newY] != 3 && maze[newX, newY] != 4 && maze[newX, newY] != 5){
-                  newX--;
-                }
-                cPlayer.shark = 0; 
-                 if (cPlayer == p1)
-                    {
-                        p1X = newX;
-                        p1Y = newY;
-                        
-                    }
-                    else
-                    {
-                        p2X = newX;
-                        p2Y = newY;
-                         
-                    }
-              }
-
-              else if (key == ConsoleKey.S && cPlayer.shark == 0) newX++;
-
-              else if (key == ConsoleKey.S && cPlayer.shark == 1){
-                while(Maze.Bounds(newX, newY, width, height) && maze[newX, newY] != 1 && maze[newX, newY] != 3 && maze[newX, newY] != 4 && maze[newX, newY] != 5){
-                  newX++;
-                }
-                cPlayer.shark = 0;
-                 if (cPlayer == p1)
-                    {
-                        p1X = newX;
-                        p1Y = newY;
-                        
-                    }
-                    else
-                    {
-                        p2X = newX;
-                        p2Y = newY; 
-                         
-                    }
-              }
-              else if (key == ConsoleKey.A && cPlayer.shark == 0) newY--;
-
-              else if (key == ConsoleKey.A && cPlayer.shark == 1){
-                while(Maze.Bounds(newX, newY, width, height) && maze[newX, newY] != 1 && maze[newX, newY] != 3 && maze[newX, newY] != 4 && maze[newX, newY] != 5){
-                  newY--;
-                }
-                cPlayer.shark = 0;
-                 if (cPlayer == p1)
-                    {
-                        p1X = newX;
-                        p1Y = newY;
-                        
-                    }
-                    else
-                    {
-                        p2X = newX;
-                        p2Y = newY;
-                         
-                    }
-              }
-              else if (key == ConsoleKey.D && cPlayer.shark == 0) newY++;
-              else if (key == ConsoleKey.W && cPlayer.shark == 1){
-                while(Maze.Bounds(newX, newY, width, height) && maze[newX, newY] != 1 && maze[newX, newY] != 3 && maze[newX, newY] != 4 && maze[newX, newY] != 5){
-                  newY++;
-                }
-                cPlayer.shark = 0;
-                 if (cPlayer == p1)
-                    {
-                        p1X = newX;
-                        p1Y = newY;
-                        
-                    }
-                    else
-                    {
-                        p2X = newX;
-                        p2Y = newY;
-                         
-                    }
-              }
-
-               if (Maze.Bounds(newX, newY, width, height) && maze[newX, newY] != 1 && cPlayer.ghost == 0)
+               if (Maze.Bounds(newX, newY, width, height))
                 {
-                  
+                  if (cPlayer.ghost > 0 || maze[newX, newY] != 1) {
+                    if(maze[newX, newY] == 1)
+                    {
+                      cPlayer.ghost = 0;
+                    }
 
                     if (maze[newX, newY] == 2) // Coleccionable encontrado
                     {
@@ -232,12 +158,13 @@ namespace MazeRunner{
                         else{
                           p2.points++;
                         } 
-
                         maze[newX, newY] = 0;
                         tPoints--;
                     }
                     else if(maze[newX, newY] == 3 ){
                       if(cPlayer.hunger == 0){
+                      Console.WriteLine("¡Has caído en una trampa! Pierdes 3 almas");
+                      Console.ReadKey(true);
                       if (cPlayer == p1){
                           cPlayer.points-=3;
                           }
@@ -245,9 +172,6 @@ namespace MazeRunner{
                         else{
                           p2.points-=3;
                           }
-                         
-
-                        maze[newX, newY] = 0;
                       }
                       else if(cPlayer.hunger == 1){
                         if (cPlayer == p1){
@@ -256,41 +180,42 @@ namespace MazeRunner{
                         else{
                           p1.points-=5;
                         }
-                        maze[newX, newY] = 0;
                         cPlayer.hunger = 0;
                       }
+                      maze[newX, newY] = 0;
                     }
                     else if(maze[newX, newY] == 4){
                       if(cPlayer.hunger == 0){
+                      Console.WriteLine("¡Oh no! Tu cooldown se ha incrementado permanentemente");
+                      Console.ReadKey(true);
                       if(cPlayer == p1){
                         cd1+= 2;
                       } 
                       else{
                         cd2+= 2;
                       }
-                        maze[newX, newY] = 0;
                       }
                       else if(cPlayer.hunger == 1){
-                        maze[newX, newY] = 0;
                         cPlayer.hunger = 0;
                         cPlayer.points -= 1;
                       }
+                      maze[newX, newY] = 0;
                     }
                     else if(maze[newX, newY] == 5){
-                      if(cPlayer.hunger == 0){     
+                      maze[newX, newY] = 0;
+                      if(cPlayer.hunger == 0){    
+                        Console.WriteLine("¡De vuelta al inicio!");
+                          Console.ReadKey(true); 
                         if(cPlayer == p1){
-                        maze[newX, newY] = 0;
                         newX = 1;
                         newY = 0;
                         }
                         else{
-                          maze[newX, newY] = 0;
                         newX = height - 2;
                         newY = width - 1;
                         }
                       }
                       else if(cPlayer.hunger == 1){
-                        maze[newX, newY] = 0;
                         cPlayer.hunger = 0; 
                         cPlayer.points -= 1;
                       }
@@ -331,7 +256,9 @@ namespace MazeRunner{
                     }
 
                     movesLeft--;
-                   
+                  
+                }
+                }
                 if (movesLeft == 0)
                 {
                   if(cPlayer == p1){
@@ -348,152 +275,7 @@ namespace MazeRunner{
                     cPlayer = cPlayer == p1 ? p2 : p1;
                  
                 }
-                 if(tPoints > 0){
-                 if (p1X == height - 2 && p1Y == width - 2 && p1.points >= p1.goal)
-                {
-                    Console.Clear();
-                    Show.Maze(p1X, p1Y, p2X, p2Y, maze, height, width, icon1, icon2);
-                    Console.WriteLine($"{p1.Name} ha ganado! 🎉");
-                    break;
-                }
-                else if (p2X == 1 && p2Y == 1 && p2.points >= p2.goal)
-                {
-                    Console.Clear();
-                    Show.Maze(p1X, p1Y, p2X, p2Y, maze, height, width, icon1, icon2);
-                    Console.WriteLine($"{p2.Name} ha ganado! 🎉");
-                    break;
-                }
-                }
-                else if(tPoints == 0){
-                  if(PW(p1.points , p2.points) == 2){
-                    Console.Clear();
-                    Show.Maze(p1X, p1Y, p2X, p2Y, maze, height, width, icon1, icon2);
-                    Console.WriteLine($"Es un empate!");
-                    break;
-                  }
-                  else if(PW(p1.points , p2.points) == 1){
-                    Console.Clear();
-                    Show.Maze(p1X, p1Y, p2X, p2Y, maze, height, width, icon1, icon2);
-                    Console.WriteLine($"{p1.Name} ha ganado! 🎉");
-                    break;
-                  }
-                  else if(PW(p1.points , p2.points) == 0){
-                    Console.Clear();
-                    Show.Maze(p1X, p1Y, p2X, p2Y, maze, height, width, icon1, icon2);
-                    Console.WriteLine($"{p2.Name} ha ganado! 🎉");
-                    break;
-                  }
-                }
 
-
-
-                }
-                else if(cPlayer.ghost == 1 && Maze.Bounds(newX, newY, width, height) && ((newX != 1 || newX != 0) && (newY != 1 || newY != 0)  ) ){
-                  if(maze[newX, newY] == 1){
-                    cPlayer.ghost = 0;
-                  }
-                  if (maze[newX, newY] == 2) // Coleccionable encontrado
-                    {
-                        if (cPlayer == p1){
-                          cPlayer.points++;
-                          
-                          } 
-                        else{
-                          p2.points++;
-                        } 
-
-                        maze[newX, newY] = 0;
-                        tPoints--;
-                    }
-                    else if(maze[newX, newY] == 3){
-                      if (cPlayer == p1){
-                          cPlayer.points-=3;
-                          }
-                         
-                        else{
-                          p2.points-=3;
-                          }
-                         
-
-                        maze[newX, newY] = 0;
-                    }
-                    else if(maze[newX, newY] == 4){
-                      if(cPlayer == p1){
-                        cd1+= 2;
-                      } 
-                      else{
-                        cd2+= 2;
-                      }
-
-                        maze[newX, newY] = 0;
-                    }
-                    else if(maze[newX, newY] == 5){     
-                        if(cPlayer == p1){
-                        maze[newX, newY] = 0;
-                        newX = 1;
-                        newY = 0;
-                        }
-                        else{
-                          maze[newX, newY] = 0;
-                        newX = height - 2;
-                        newY = width - 1;
-                        }
-                        
-                    }
-                    else if(maze[newX, newY] == 7){
-                      if(cPlayer == p1){
-                        movesLeft++;
-                      }
-                      else{
-                        if(movesLeft > 0){
-                        movesLeft--;
-                        }
-                      }
-                    }
-                    else if(maze[newX, newY] == 8){
-                      if(cPlayer == p2){
-                        movesLeft++;
-                      }
-                      else{
-                        if(movesLeft > 0){
-                        movesLeft--;
-                        }
-                      }
-                    }
-                    
-                     
-
-                    if (cPlayer == p1)
-                    {
-                        p1X = newX;
-                        p1Y = newY;
-                        
-                    }
-                    else
-                    {
-                        p2X = newX;
-                        p2Y = newY;
-                    }
-
-                    movesLeft--;
-                   
-                if (movesLeft == 0)
-                {
-                  if(cPlayer == p1){
-                  if(p1.cooldown > 0){
-                          p1.cooldown--;
-                        }
-                }
-                else{
-                  if(p2.cooldown > 0){
-                    p2.cooldown--;
-                  }
-                }
-
-                    movesLeft = cPlayer.moves;
-                    cPlayer = cPlayer == p1 ? p2 : p1;
-                  
-                }
                 if(tPoints > 0){
                  if (p1X == height - 2 && p1Y == width - 2 && p1.points >= p1.goal)
                 {
@@ -530,8 +312,6 @@ namespace MazeRunner{
                     break;
                   }
                 }
-                }
-                
                   
             
         }
@@ -554,6 +334,19 @@ namespace MazeRunner{
       else{
         return 0;
       }
+    }
+    private static void SkillActivate(int id, Player cPlayer){
+        if(id == 0)
+        {
+          cPlayer.ghost = cPlayer.Skill(0);
+        }
+        else if(id == 1)
+        {
+          cPlayer.shark = cPlayer.Skill(1);
+        }
+        else if(id == 2){
+          cPlayer.hunger = cPlayer.Skill(2);
+        }
     }
   }
     
